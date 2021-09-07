@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/EgorSkurihin/Calendar/pkg/models"
 	"github.com/gorilla/mux"
 )
 
@@ -18,7 +20,16 @@ func (app *Application) showCalendar(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.pageNotFound(w)
 	}
-	response := fmt.Sprintf("<h1>Кадендарь с id = %d</h1>", id)
+	cal, err := app.calendar.GetCalendar(id)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecords) {
+			fmt.Fprint(w, "<h1>Такого календаря нет!</h1>")
+			return
+		}
+		fmt.Fprint(w, "<h1>Внутрення ошибка сервера!</h1>")
+		return
+	}
+	response := fmt.Sprintf("<h1>Кадендарь: %s</h1><h1>Год: %d</h1>", cal.Name, cal.Year)
 	fmt.Fprint(w, response)
 }
 

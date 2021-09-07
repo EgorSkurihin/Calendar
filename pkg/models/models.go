@@ -1,5 +1,9 @@
 package models
 
+import "errors"
+
+var ErrNoRecords = errors.New("No records in table")
+
 type Calendar struct {
 	Id   int
 	Name string
