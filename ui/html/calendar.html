@@ -1,0 +1,19 @@
+{{template "base" .}}
+{{define "headlinks"}}<link rel="stylesheet" href="/static/css/cal.css">{{end}}
+{{define "title"}}Ваш календрь{{end}}
+{{define "content"}}
+    <h2>Календарь "{{.Name}}" на {{.Year}} год</h2>
+    <div class="months">
+        {{range .Months}}
+                <a class="month" href="/month/{{.Id}}">
+                    <h3>{{.Name}}</h3>
+                    {{if .IsAnyEvents}}
+                        <div class="isevents yesevents">Есть события</div>
+                    {{else}}
+                        <div class="isevents noevents">Событий нет</div>
+                    {{end}}
+                    
+                </a>
+        {{end}}
+    </div>
+{{end}}

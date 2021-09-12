@@ -1,0 +1,30 @@
+{{template "base" .}}
+{{define "headlinks"}}<link rel="stylesheet" href="/static/css/month.css">{{end}}
+{{define "title"}}Месяц{{end}}
+{{define "content"}}
+    <a class="back" href="/calendar/{{.Month.CalendarId}}">Вернуться к календарю</a>
+    <form action="" method="post" class="event">
+        <h2>Создание нового события</h2>
+        <div class="field">
+            <input type="text" name="title" placeholder="Название события" id="title" />
+        </div>
+        <div class="field">
+            <input type="text" name="description" placeholder="Описание события" id="description" />
+        </div>
+        <div class="field">
+            <input type="number" name="day" min="1" max="31" step="1" value="1" id="day" />
+        </div>
+
+        <input type="submit" value="Создать событие"/>
+    </form>
+
+    <h2>События в месяце {{.Month.Name}}</h2>
+    <ol class="events">
+        {{range .Events}}
+            <li class="event">
+                <h3>{{.Day}} - {{.Title}}</h3>
+                <p><i>{{.Description}}</i></p>
+            </li>
+        {{end}}
+    </ol>
+{{end}}

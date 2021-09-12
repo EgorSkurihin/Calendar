@@ -1,0 +1,16 @@
+{{template "base" .}}
+{{define "headlinks"}}<link rel="stylesheet" href="/static/css/home.css">{{end}}
+{{define "title"}}Главная{{end}}
+{{define "content"}}
+    <i>Здесь вы можете создать публичный календарь и события внутри него.</i>
+    <h2>Последние созданные календари</h2>
+    <ol class="cals">
+        {{range .Cals}}
+            <li class="cal">
+                <h3><a href="calendar/{{.Id}}">{{.Name}}</a></h3>
+                <p><i>{{.Year}} год</i></p>
+            </li>
+        {{end}}
+    </ol>
+    
+{{end}}

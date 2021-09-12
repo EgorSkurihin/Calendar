@@ -1,0 +1,45 @@
+.content{
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.month{
+    display: block;
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    float: left;
+    width: 24%;
+    height: 90px;
+    margin:7px 7px 0 0;
+    padding-top: 5px;
+    border-radius: 5%;
+    background-color: #77A6F7;
+}
+
+.month:hover{
+    background-color: #00887A;
+    transition: 0.2s;
+}
+
+.content h2{
+    font-weight: 700;
+    font-size: 26px;
+    color: #00887A;
+    padding-bottom: 10px;
+}
+
+.content h3 {
+    font-weight: 500;
+    font-size: 24px;
+    padding-bottom: 5px;
+}
+
+.isevents{
+    align-items: center;
+}
+
+.yesevents{
+    font-weight: 700;
+}

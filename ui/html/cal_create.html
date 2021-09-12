@@ -1,0 +1,16 @@
+{{template "base" .}}
+{{define "headlinks"}}<link rel="stylesheet" href="/static/css/cal_create.css">{{end}}
+{{define "title"}}Создание календаря{{end}}
+{{define "content"}}
+        <form action="/calendar/create" method="post" class="calendar">
+            <h2>Создание нового календаря</h2>
+            <div class="field">
+                <input type="text" name="title" placeholder="Название календаря" id="title" />
+            </div>
+            <div class="field">
+                <input type="number" name="year" min="2021" max="2099" step="1" value="2021" id="year" />
+            </div>
+            <input type="submit" value="Создать календарь"/>
+        </form>
+        <i>Не забудьте сохранить URL календаря после его создания</i>
+{{end}}

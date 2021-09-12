@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -11,7 +12,30 @@ import (
 )
 
 func (app *Application) home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "<h1>Главная страница</h1>")
+	cals, err := app.calendar.LatestCalednars()
+	if err != nil {
+		app.errorLog.Fatal(err)
+		return
+	}
+
+	files := []string{
+		"./ui/html/home.html",
+		"./ui/html/base.html"}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.errorLog.Fatal(err)
+		return
+	}
+	err = ts.Execute(w,
+		struct {
+			Cals []*models.Calendar
+		}{
+			cals})
+	if err != nil {
+		app.errorLog.Fatal(err)
+		return
+	}
 }
 
 func (app *Application) showCalendar(w http.ResponseWriter, r *http.Request) {
@@ -23,35 +47,122 @@ func (app *Application) showCalendar(w http.ResponseWriter, r *http.Request) {
 	cal, err := app.calendar.GetCalendar(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecords) {
-			fmt.Fprint(w, "<h1>Такого календаря нет!</h1>")
+			app.pageNotFound(w)
 			return
 		}
-		fmt.Fprint(w, "<h1>Внутрення ошибка сервера!</h1>")
+		app.serverError(w, err)
 		return
 	}
-	response := fmt.Sprintf("<h1>Кадендарь: %s</h1><h1>Год: %d</h1>", cal.Name, cal.Year)
-	fmt.Fprint(w, response)
+	files := []string{
+		"./ui/html/calendar.html",
+		"./ui/html/base.html"}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = ts.Execute(w, cal)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
+
+func (app *Application) calendarCreateForm(w http.ResponseWriter, r *http.Request) {
+	files := []string{
+		"./ui/html/cal_create.html",
+		"./ui/html/base.html"}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	err = ts.Execute(w, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
+
+func (app *Application) createCalendar(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.errorLog.Fatal(err)
+		return
+	}
+	title := r.FormValue("title")
+	year, err := strconv.Atoi(r.FormValue("year"))
+	if err != nil {
+		http.Redirect(w, r, "/calendar", http.StatusTemporaryRedirect)
+		return
+	}
+	id, err := app.calendar.InsertCalendar(title, year)
+	if err != nil {
+		app.errorLog.Fatal(err)
+		return
+	}
+	app.calendar.FillCalendarByMonths(id)
+	url := fmt.Sprintf("/calendar/%d", id)
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func (app *Application) showMonth(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	calId, err := strconv.Atoi(vars["calendar"])
-	if err != nil {
-		app.pageNotFound(w)
-		return
-	}
 	monthID, err := strconv.Atoi(vars["month"])
 	if err != nil {
 		app.pageNotFound(w)
 		return
 	}
-	if monthID < 1 || monthID > 12 {
-		app.pageNotFound(w)
+
+	month, err := app.calendar.GetMonth(monthID)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecords) {
+			app.pageNotFound(w)
+			return
+		}
+		app.serverError(w, err)
 		return
 	}
-	fmt.Fprintf(w, "<h1>Календарь с id %d</h1><h1>Месяц номер %d</h1>", calId, monthID)
-}
 
-func (app *Application) pageNotFound(w http.ResponseWriter) {
-	http.Error(w, "Страница не найдена - 404", http.StatusNotFound)
+	events, err := app.calendar.GetEventsByMonthId(monthID)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRecords) {
+			app.pageNotFound(w)
+			return
+		}
+		app.errorLog.Fatal(err)
+		return
+	}
+
+	if r.Method == http.MethodPost {
+		title := r.FormValue("title")
+		description := r.FormValue("description")
+		day, err := strconv.Atoi(r.FormValue("day"))
+		if err != nil {
+			return
+		}
+		_, err = app.calendar.InsertEvent(title, description, monthID, day)
+		if err != nil {
+			app.errorLog.Fatal(err)
+		}
+	}
+
+	files := []string{
+		"./ui/html/month.html",
+		"./ui/html/base.html"}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.errorLog.Fatal(err)
+		return
+	}
+	err = ts.Execute(w,
+		struct {
+			Month  models.Month
+			Events []*models.Event
+		}{
+			*month, events})
+	if err != nil {
+		app.errorLog.Fatal(err)
+	}
 }

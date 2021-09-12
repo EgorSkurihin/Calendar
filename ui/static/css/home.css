@@ -1,0 +1,65 @@
+.content h2{
+    font-weight: 700;
+    font-size: 26px;
+    color: #00887A;
+    margin: 25px 15px 15px 15px;
+}
+
+i{  
+    display: block;
+    margin: 15px 15px 15px 15px;
+}
+
+.back{
+    display: block;
+    margin-top: 15px;
+    text-decoration: underline;
+    color: tomato;
+}
+
+.back:hover{
+    color:rgb(187, 72, 52);
+}
+
+.cals {
+    margin-top: 20px;
+    margin-left: 0;
+    list-style: none;
+    counter-reset: li;
+}
+
+.cals li {
+    padding: 10px 0;
+    position: relative;
+    left: 1.5em;
+    margin-bottom: 0.75em;
+    padding-left: 1em;
+    background: #77A6F7;
+}
+
+.cals li:before {
+    padding: 10px 0;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1.5em;
+    width: 1.875em;
+    text-align: center;
+    font-weight: bold;
+    background: #00887A;
+    border-bottom-left-radius: 70em;
+    border-top-left-radius: 70em;
+    counter-increment: li;
+    content: "";
+}
+
+.cals li h3 a{
+    font-size: 22px;
+}
+.cals li h3 a:hover{
+    text-decoration: underline;
+}
+
+.cals li p{
+    margin-top: 10px;
+}

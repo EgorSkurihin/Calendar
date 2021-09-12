@@ -5,15 +5,17 @@ import "errors"
 var ErrNoRecords = errors.New("No records in table")
 
 type Calendar struct {
-	Id   int
-	Name string
-	Year int
+	Id     int
+	Name   string
+	Year   int
+	Months []*Month
 }
 
 type Month struct {
-	Id         int
-	Name       string
-	CalendarId int
+	Id          int
+	Name        string
+	CalendarId  int
+	IsAnyEvents bool
 }
 
 type Event struct {
